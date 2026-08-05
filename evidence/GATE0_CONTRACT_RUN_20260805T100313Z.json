@@ -1,0 +1,38 @@
+{
+  "run_id": "gate0-contracts-20260805T100313Z",
+  "executed_at": "2026-08-05T10:03:13Z",
+  "scope": "gate0_contracts_state_machine_and_settlement_invariants",
+  "source_manifest_sha256": "f064fa8e5893b71cf2ad4b30fe7a3ea2f49004031a373dff760cc123ab9e4f6e",
+  "source_manifest_includes": ["contracts", "gate0", "fixtures", "tests"],
+  "runtime": {
+    "python": "3.9.6",
+    "jsonschema": "4.25.1"
+  },
+  "command": ".venv/bin/python -m unittest discover -s tests -v",
+  "result": "pass",
+  "tests_run": 17,
+  "failures": 0,
+  "errors": 0,
+  "verified_invariants": [
+    "seven JSON Schema 2020-12 contracts are structurally valid",
+    "seven valid synthetic fixtures are accepted",
+    "eight adversarial synthetic fixtures are rejected",
+    "task contract exposes no caller-supplied document or callback URL",
+    "state transitions are ordered, terminal, append-only, and idempotent",
+    "late cancellation and invalid transition-key reuse are rejected",
+    "capture cannot exceed authorization or occur twice",
+    "provider replay does not double-charge",
+    "partial capture releases the remainder",
+    "internal failure releases authorization or refunds captured amount"
+  ],
+  "not_demonstrated_by_this_run": [
+    "parser isolation and adversarial PDF handling",
+    "cross-account namespace enforcement",
+    "renderer output sanitization",
+    "real payment-provider webhook reconciliation",
+    "AAT golden case reproduction",
+    "Gate 1 benchmark validity or product value"
+  ],
+  "gate0_exit_authorized": false,
+  "public_paid_launch_authorized": false
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/settlement-event.schema.json",
+  "title": "Settlement Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "event_id", "task_id", "payment_attempt_id", "sequence", "action", "amount_minor_units", "currency", "occurred_at", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "event_id": {"type": "string", "pattern": "^evt_[A-Za-z0-9_-]{8,64}$"},
+    "task_id": {"type": "string", "pattern": "^diag_[A-Za-z0-9_-]{8,64}$"},
+    "payment_attempt_id": {"type": "string", "pattern": "^pay_[A-Za-z0-9_-]{8,64}$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "action": {"enum": ["authorize", "capture", "release", "refund"]},
+    "amount_minor_units": {"type": "integer", "minimum": 0},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "idempotency_key": {"type": "string", "pattern": "^idem_[A-Za-z0-9_-]{16,128}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"action": {"enum": ["authorize", "capture"]}}, "required": ["action"]},
+      "then": {"properties": {"amount_minor_units": {"minimum": 1}}}
+    }
+  ]
+}

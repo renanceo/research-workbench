@@ -1,0 +1,2 @@
+{"contract_version":"1.0","event_id":"evt_case0001_pay001","task_id":"diag_case0001","payment_attempt_id":"pay_case0001","sequence":1,"action":"authorize","amount_minor_units":0,"currency":"USD","occurred_at":"2026-08-05T00:00:00Z","idempotency_key":"idem_case0001_payment_authorize"}
+

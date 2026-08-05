@@ -1,0 +1,2 @@
+{"contract_version":"1.0","task_id":"diag_case0001","status":"timed_out","deadline_at":"2026-08-05T00:30:00Z","error":{"code":"TASK_DEADLINE_EXCEEDED","public_message":"/srv/private/prompt.txt failed with sk-secret","retryable":true,"internal_trace":"stack"},"settlement":{"action":"release_authorization","billable_minor_units":0,"currency":"USD"}}
+

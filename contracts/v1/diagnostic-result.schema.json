@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/diagnostic-result.schema.json",
+  "title": "Diagnostic Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "status", "report", "versions", "metering"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^diag_[A-Za-z0-9_-]{8,64}$"},
+    "status": {"const": "completed"},
+    "report": {"$ref": "#/$defs/report"},
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "protocol", "knowledge_release", "fact_snapshot", "report_schema"],
+      "properties": {
+        "engine": {"type": "string", "minLength": 1, "maxLength": 100},
+        "protocol": {"type": "string", "minLength": 1, "maxLength": 100},
+        "knowledge_release": {"type": "string", "pattern": "^kr_[A-Za-z0-9_.-]+$"},
+        "fact_snapshot": {"type": "string", "pattern": "^fs_[A-Za-z0-9_.-]+$"},
+        "report_schema": {"const": "positioning-diagnostic-1.0"}
+      }
+    },
+    "metering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_cost_minor_units", "retrieval_cost_minor_units", "allocated_variable_cost_minor_units", "currency"],
+      "properties": {
+        "provider_cost_minor_units": {"type": "integer", "minimum": 0},
+        "retrieval_cost_minor_units": {"type": "integer", "minimum": 0},
+        "allocated_variable_cost_minor_units": {"type": "integer", "minimum": 0},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 2000}
+    },
+    "venue_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["venue_id", "venue_name", "positive_evidence", "negative_evidence", "uncertainty", "validated_coverage"],
+      "properties": {
+        "venue_id": {"type": "string", "pattern": "^venue_[A-Za-z0-9_-]{2,80}$"},
+        "venue_name": {"type": "string", "minLength": 1, "maxLength": 300},
+        "positive_evidence": {"$ref": "#/$defs/evidence"},
+        "negative_evidence": {"$ref": "#/$defs/evidence"},
+        "uncertainty": {"enum": ["low", "moderate", "high"]},
+        "validated_coverage": {"type": "boolean"}
+      }
+    },
+    "current_fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["venue_id", "fact_type", "value", "source_url", "source_excerpt", "source_locator", "retrieved_at", "content_hash", "valid_until", "verification_status"],
+      "properties": {
+        "venue_id": {"type": "string", "pattern": "^venue_[A-Za-z0-9_-]{2,80}$"},
+        "fact_type": {"enum": ["article_type", "scope", "deadline", "apc", "preprint_policy", "ai_policy", "data_policy"]},
+        "value": {"type": "string", "maxLength": 4000},
+        "source_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "source_excerpt": {"type": "string", "maxLength": 2000},
+        "source_locator": {"type": "string", "maxLength": 1000},
+        "retrieved_at": {"type": "string", "format": "date-time"},
+        "content_hash": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "valid_until": {"type": "string", "format": "date-time"},
+        "verification_status": {"enum": ["verified", "ambiguous", "stale", "not_found"]}
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paper_profile", "community_map", "candidate_venues", "not_recommended", "positioning_risks", "positioning_actions", "abstentions", "coverage_limitations", "current_facts"],
+      "properties": {
+        "paper_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["question", "contribution_shape", "method", "evidence_shape", "uncertainty"],
+          "properties": {
+            "question": {"type": "string", "maxLength": 4000},
+            "contribution_shape": {"type": "string", "maxLength": 4000},
+            "method": {"type": "string", "maxLength": 4000},
+            "evidence_shape": {"type": "string", "maxLength": 4000},
+            "uncertainty": {"type": "string", "maxLength": 4000}
+          }
+        },
+        "community_map": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 1000}},
+        "candidate_venues": {"type": "array", "maxItems": 5, "items": {"$ref": "#/$defs/venue_assessment"}},
+        "not_recommended": {"type": "array", "items": {"$ref": "#/$defs/venue_assessment"}},
+        "positioning_risks": {"$ref": "#/$defs/evidence"},
+        "positioning_actions": {"$ref": "#/$defs/evidence"},
+        "abstentions": {"$ref": "#/$defs/evidence"},
+        "coverage_limitations": {"$ref": "#/$defs/evidence"},
+        "current_facts": {"type": "array", "items": {"$ref": "#/$defs/current_fact"}}
+      }
+    }
+  }
+}
+

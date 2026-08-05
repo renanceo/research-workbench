@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/task-event.schema.json",
+  "title": "Task Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "event_id", "task_id", "sequence", "from_state", "to_state", "occurred_at", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "event_id": {"type": "string", "pattern": "^evt_[A-Za-z0-9_-]{8,64}$"},
+    "task_id": {"type": "string", "pattern": "^diag_[A-Za-z0-9_-]{8,64}$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "from_state": {"$ref": "#/$defs/state"},
+    "to_state": {"$ref": "#/$defs/state"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "idempotency_key": {"type": "string", "pattern": "^idem_[A-Za-z0-9_-]{16,128}$"}
+  },
+  "$defs": {
+    "state": {"enum": ["draft", "awaiting_input", "estimated", "payment_authorized", "queued", "parsing", "analyzing", "verifying_facts", "awaiting_human_review", "completed", "rejected_input", "cancelled", "timed_out", "failed", "payment_failed", "expired"]}
+  }
+}
+

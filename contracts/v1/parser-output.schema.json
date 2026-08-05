@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/parser-output.schema.json",
+  "title": "Isolated Parser Output v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "document_sha256", "page_count", "text", "warnings", "error_code"],
+  "properties": {
+    "schema_version": {"const": "parser-output-1.0"},
+    "status": {"enum": ["accepted", "rejected"]},
+    "document_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "page_count": {"type": "integer", "minimum": 0, "maximum": 500},
+    "text": {"type": "string", "maxLength": 1000000},
+    "warnings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["POSSIBLE_HIDDEN_TEXT", "MALFORMED_UNICODE_REPLACED"]}
+    },
+    "error_code": {
+      "type": ["string", "null"],
+      "enum": [null, "UNSUPPORTED_DOCUMENT", "UNSAFE_ACTIVE_CONTENT", "EMBEDDED_ATTACHMENT", "EXTERNAL_RESOURCE", "DOCUMENT_PARSE_FAILED", "INPUT_TOO_LARGE", "PAGE_LIMIT_EXCEEDED", "PAGE_DIMENSION_EXCEEDED", "TEXT_LIMIT_EXCEEDED", "DECOMPRESSION_LIMIT_EXCEEDED", "PARSER_TIMEOUT", "PARSER_RESOURCE_LIMIT", "PARSER_PROTOCOL_ERROR"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "accepted"}}, "required": ["status"]},
+      "then": {"properties": {"error_code": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "rejected"}}, "required": ["status"]},
+      "then": {"properties": {"text": {"const": ""}, "error_code": {"type": "string"}}}
+    }
+  ]
+}
+

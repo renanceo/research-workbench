@@ -1,0 +1,32 @@
+{
+  "finding_id": "GATE0-001",
+  "title": "Missing font resources bypass semantic extracted-text budget",
+  "status": "fixed_and_regression_tested",
+  "severity": "high",
+  "affected_boundary": "isolated_pdf_parser",
+  "trigger": {
+    "description": "A PDF content stream contains a long Tj text operand but no font resource. pypdf returns an empty string from extract_text(), while the raw decoded content stream still contains the text operation.",
+    "semantic_extracted_characters": 0,
+    "decoded_content_stream_bytes": 511,
+    "configured_regression_text_limit": 100
+  },
+  "pre_fix_behavior": "The semantic extracted-text counter remained at zero, so the document could pass the text budget despite carrying a long text operand.",
+  "post_fix_behavior": {
+    "description": "The parser enforces both semantic extracted length and decoded content-stream text-operation bytes.",
+    "status": "rejected",
+    "error_code": "TEXT_LIMIT_EXCEEDED"
+  },
+  "minimal_reproduction": {
+    "file": "fixtures/security/GATE0-001-missing-font-text-budget.pdf",
+    "sha256": "bdd82529bc16cf016ec663ef4b76dc398395f1ff30f6043596180d05c6f08d46",
+    "generator": "scripts/generate_security_fixtures.py",
+    "generator_sha256": "0a2315b9e9a9c467392cae8460a1af23e28471cd408cc8cf77bbd5db778a1804"
+  },
+  "regression_test": {
+    "test_id": "tests.test_parser_isolation.ParserIsolationTests.test_file_page_dimension_text_and_decompression_limits",
+    "expected_error_code": "TEXT_LIMIT_EXCEEDED"
+  },
+  "security_invariant": "Parser budgets must combine semantic extracted length, raw text-operation bytes, decoded byte budget, and execution resource limits.",
+  "gate1_metric_impact": "none",
+  "paid_launch_authorization": false
+}

@@ -1,0 +1,9 @@
+{
+  "contract_version": "1.0",
+  "task_id": "diag_case0001",
+  "status": "cancelled",
+  "requested_at": "2026-08-05T00:00:00Z",
+  "effective_at": "2026-08-05T00:00:01Z",
+  "settlement": {"action": "release_authorization", "billable_minor_units": 0, "currency": "USD"}
+}
+

@@ -1,0 +1,11 @@
+{
+  "contract_version": "1.0",
+  "event_id": "evt_case0001_001",
+  "task_id": "diag_case0001",
+  "sequence": 1,
+  "from_state": "estimated",
+  "to_state": "payment_authorized",
+  "occurred_at": "2026-08-05T00:00:00Z",
+  "idempotency_key": "idem_case0001_authorize"
+}
+

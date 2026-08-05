@@ -1,0 +1,54 @@
+{
+  "contract_version": "1.0",
+  "task_id": "diag_case0001",
+  "status": "completed",
+  "report": {
+    "paper_profile": {
+      "question": "Synthetic research question.",
+      "contribution_shape": "Synthetic methodological contribution.",
+      "method": "Synthetic controlled comparison.",
+      "evidence_shape": "Synthetic benchmark evidence.",
+      "uncertainty": "External validity is not established."
+    },
+    "community_map": ["synthetic-methods"],
+    "candidate_venues": [{
+      "venue_id": "venue_example_a",
+      "venue_name": "Example Venue A",
+      "positive_evidence": ["The stated scope includes the method."],
+      "negative_evidence": ["The evidence scale may be below the venue norm."],
+      "uncertainty": "moderate",
+      "validated_coverage": true
+    }],
+    "not_recommended": [],
+    "positioning_risks": ["Contribution may read as incremental."],
+    "positioning_actions": ["Clarify the decision-relevant contribution."],
+    "abstentions": ["No acceptance-probability estimate."],
+    "coverage_limitations": ["Synthetic fixture; no real venue judgment."],
+    "current_facts": [{
+      "venue_id": "venue_example_a",
+      "fact_type": "scope",
+      "value": "Synthetic scope value.",
+      "source_url": "https://official-publisher.example/venue-a/scope",
+      "source_excerpt": "Synthetic official text.",
+      "source_locator": "main > section#scope",
+      "retrieved_at": "2026-08-05T00:00:00Z",
+      "content_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "valid_until": "2026-11-05T00:00:00Z",
+      "verification_status": "verified"
+    }]
+  },
+  "versions": {
+    "engine": "mock-0.1.0",
+    "protocol": "cri-1.0",
+    "knowledge_release": "kr_synthetic_001",
+    "fact_snapshot": "fs_synthetic_001",
+    "report_schema": "positioning-diagnostic-1.0"
+  },
+  "metering": {
+    "provider_cost_minor_units": 100,
+    "retrieval_cost_minor_units": 20,
+    "allocated_variable_cost_minor_units": 150,
+    "currency": "USD"
+  }
+}
+

@@ -1,0 +1,80 @@
+{
+  "run_id": "gate0-security-20260805T101838Z",
+  "executed_at": "2026-08-05T10:18:38Z",
+  "environment_category": "local_macos_isolated_runner",
+  "scope": "parser_isolation_cross_account_namespace_and_output_sanitization",
+  "source_manifest_sha256": "2776befd17bac2dcdf8f56127cc3b43242fb5c34bbea9503e3e6b486eb69ba46",
+  "source_manifest_includes": ["contracts", "gate0", "fixtures", "tests", "pyproject.toml"],
+  "commit_id": null,
+  "commit_id_status": "unavailable_not_a_git_repository",
+  "contract_versions": {
+    "public_contract": "1.0",
+    "parser_output": "parser-output-1.0",
+    "report_schema": "positioning-diagnostic-1.0"
+  },
+  "runtime": {
+    "python": "3.9.6",
+    "jsonschema": "4.25.1",
+    "pypdf": "6.14.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "sandbox_executable_sha256": "8290e4be7387a0df83cd1559e86afd880464f269450573d012795761fe298f16"
+  },
+  "fixtures": {
+    "static_fixture_manifest_sha256": "629f6fc7288da804c30e87d028f88879394fe2e17ab5068b0975e07e7a59a150",
+    "static_fixture_count": 17,
+    "dynamic_pdf_generator_sha256": "907791856660f80f69037871c1a526a1bd9500e40bb7d955d98db8b08bf00027",
+    "static_fixture_sha256": {
+      "invalid/diagnostic-cancellation__billable.json": "b80befefc1fa5a1537d5109183aeb9a55b6194e68164038fa49d4002d611d86e",
+      "invalid/diagnostic-failure__provider-trace.json": "bdd5c0da592e27aa615d1cf27d0e0ce5539363832418f32f48ba23fcf0184bfa",
+      "invalid/diagnostic-result__unofficial-http-fact.json": "ced4db5663d4e1e5f6e8381c9b8b8441470349e34f7ad76d6d6692f1b77ccd48",
+      "invalid/diagnostic-task__bad-hash.json": "f069e3d587596e1ee4b96d47959fa9e4d124bd6d90c5a976f08ffdeb8533e3f5",
+      "invalid/diagnostic-task__document-url.json": "f2b2673041c8fc688e9d1656359c884e8d0a637abb6f3263b02384e2f864f23e",
+      "invalid/diagnostic-timeout__internal-message.json": "baaa7ccd3ede026b4af65a9b470ad587e91425fa36f81da9210f5ff1ce4cc8fc",
+      "invalid/parser-output__accepted-with-error.json": "40648123868e4a073344d419f4808bd3b86f4c78c6cf1d76764310033981cfdc",
+      "invalid/settlement-event__zero-authorization.json": "a3951ad226cce15d859ecbec6c882c9b2c290ceb94cfaa6862fd2c854f357aed",
+      "invalid/task-event__unknown-state.json": "709e82e9b56f1d8960fb6a339b251e0371bddcea326f815ad96922cb74029c5d",
+      "valid/diagnostic-cancellation.json": "a14da7d119dd61d8a7911ef8dab59a4c55972ac50deb4371504000359d80e782",
+      "valid/diagnostic-failure.json": "e072f5a9fb2dc03280088689cf6d95e3eb872c63d3e286ab68dacf5746f22ab7",
+      "valid/diagnostic-result.json": "15bd8684f7e7746f42650d54e1d39a5d2f2d55dcb82d29c32f7fa601efcb68ec",
+      "valid/diagnostic-task.json": "f813631fd5b41c2ffac540c2b9412b5fdbb5f99dcd9a2274cde0bf8ec4360dd9",
+      "valid/diagnostic-timeout.json": "e5b07ecbaa4d3e6cbe2233377e8fa4233d457d306e6f94b0c468817776434bc6",
+      "valid/parser-output.json": "0ab55ed974c595b4955267410a60dc8fccbd4f154f4782cef9087aa1a242c1b9",
+      "valid/settlement-event.json": "122f34d20c66f5deb18abd30141b09e3da54fc40247cd036466bbcf739daccdc",
+      "valid/task-event.json": "75344eaee203febb8cac570fd3e831d325588fec6ef580c4de8b9046deaaa2c2"
+    }
+  },
+  "command": ".venv/bin/python -m unittest discover -s tests -v",
+  "result": "pass_with_recorded_platform_limitations",
+  "tests_run": 40,
+  "failures": 0,
+  "errors": 0,
+  "verified_invariants": [
+    "parser subprocess network access is denied by the macOS sandbox",
+    "parser subprocess receives no database, payment, storage, or project-secret environment variables",
+    "configured credential roots cannot be read by the parser subprocess",
+    "parser writes only within a one-time workspace and the workspace is removed after execution",
+    "CPU, file size, open-file, input, page, page-dimension, text, decompression, output, and wall-time budgets are enforced",
+    "active PDF content, embedded attachments, external resources, malformed structure, and oversized inputs fail closed",
+    "possible white-on-white instruction text is marked as untrusted evidence",
+    "parser output is validated against parser-output-1.0 before crossing the boundary",
+    "all resource types deny cross-account read and delete with an indistinguishable not-found response",
+    "task-document and parent-child ownership mismatches are denied",
+    "resource identifiers are opaque and retrieval cache keys are account namespaced",
+    "download capabilities are account-bound, expiring, and single-use",
+    "human-review grants are resource- and action-scoped",
+    "report output is schema validated, semantically checked, and rendered as escaped plain text",
+    "HTML, SVG, script, event handler, iframe, object, embed, CSS, Markdown link, data URL, bidi, oversized output, fake system notice, internal path, secret, and provider-trace attacks are rejected or rendered inert"
+  ],
+  "not_demonstrated_by_this_run": [
+    "hard memory enforcement on macOS; RLIMIT_AS and RLIMIT_DATA are not usable for this interpreter and require a Linux isolated runner or container limit",
+    "a commit-bound rebuild because this directory is not yet a Git repository",
+    "fuzzing against a large real malformed-PDF corpus",
+    "native parser-library compromise resistance beyond the macOS sandbox policy",
+    "downstream model prompt-injection resistance; hidden text is only flagged as untrusted at this boundary",
+    "AAT golden case reproduction",
+    "Gate 1 benchmark validity or product value"
+  ],
+  "complete_parser_isolation": false,
+  "complete_gate0": false,
+  "public_paid_launch_authorized": false
+}

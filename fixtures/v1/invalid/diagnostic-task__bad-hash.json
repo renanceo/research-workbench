@@ -1,0 +1,2 @@
+{"contract_version":"1.0","task_id":"diag_case0001","task_type":"paper_positioning_diagnostic","idempotency_key":"idem_task_case0001_submit","input":{"document_id":"doc_case0001","document_sha256":"not-a-hash","language":"en","candidate_venues":[],"decision_constraints":{"priority":"fit","target_date":null,"notes":""}},"authorization":{"estimate_id":"est_case0001","maximum_billable_minor_units":500,"currency":"USD"}}
+

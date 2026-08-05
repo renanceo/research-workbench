@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/diagnostic-task.schema.json",
+  "title": "Diagnostic Task v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "task_type", "input", "authorization", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^diag_[A-Za-z0-9_-]{8,64}$"},
+    "task_type": {"const": "paper_positioning_diagnostic"},
+    "idempotency_key": {"type": "string", "pattern": "^idem_[A-Za-z0-9_-]{16,128}$"},
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "document_sha256", "language", "candidate_venues", "decision_constraints"],
+      "properties": {
+        "document_id": {"type": "string", "pattern": "^doc_[A-Za-z0-9_-]{8,64}$"},
+        "document_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "language": {"type": "string", "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$"},
+        "candidate_venues": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^venue_[A-Za-z0-9_-]{2,80}$"}
+        },
+        "decision_constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["priority", "target_date", "notes"],
+          "properties": {
+            "priority": {"enum": ["fit", "timing", "prestige", "open_access", "desk_rejection_risk"]},
+            "target_date": {"type": ["string", "null"], "format": "date"},
+            "notes": {"type": "string", "maxLength": 2000}
+          }
+        }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimate_id", "maximum_billable_minor_units", "currency"],
+      "properties": {
+        "estimate_id": {"type": "string", "pattern": "^est_[A-Za-z0-9_-]{8,64}$"},
+        "maximum_billable_minor_units": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+      }
+    }
+  }
+}
+

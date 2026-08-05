@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/diagnostic-cancellation.schema.json",
+  "title": "Diagnostic Cancellation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "status", "requested_at", "effective_at", "settlement"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^diag_[A-Za-z0-9_-]{8,64}$"},
+    "status": {"const": "cancelled"},
+    "requested_at": {"type": "string", "format": "date-time"},
+    "effective_at": {"type": "string", "format": "date-time"},
+    "settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "billable_minor_units", "currency"],
+      "properties": {
+        "action": {"const": "release_authorization"},
+        "billable_minor_units": {"const": 0},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+      }
+    }
+  }
+}
+

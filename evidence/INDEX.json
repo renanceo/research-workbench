@@ -1,0 +1,17 @@
+{
+  "evidence_index_version": "1.0",
+  "runs": [
+    {
+      "run_id": "gate0-contracts-20260805T100313Z",
+      "file": "GATE0_CONTRACT_RUN_20260805T100313Z.json",
+      "provenance": "historical_pre_git_run",
+      "immutable": true
+    },
+    {
+      "run_id": "gate0-security-20260805T101838Z",
+      "file": "GATE0_SECURITY_RUN_20260805T101838Z.json",
+      "provenance": "historical_pre_git_run",
+      "immutable": true
+    }
+  ]
+}

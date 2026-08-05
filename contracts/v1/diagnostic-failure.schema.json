@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-workbench.example/contracts/v1/diagnostic-failure.schema.json",
+  "title": "Diagnostic Failure v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "status", "error", "settlement"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^diag_[A-Za-z0-9_-]{8,64}$"},
+    "status": {"enum": ["rejected_input", "failed", "payment_failed", "expired"]},
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "public_message", "retryable"],
+      "properties": {
+        "code": {"enum": ["UNSUPPORTED_DOCUMENT", "UNSAFE_DOCUMENT", "DOCUMENT_PARSE_FAILED", "INPUT_TOO_LARGE", "DOMAIN_OUT_OF_COVERAGE", "INSUFFICIENT_MANUSCRIPT_DETAIL", "PROVIDER_TIMEOUT", "PROVIDER_FAILURE", "INTERNAL_ERROR", "PAYMENT_AUTHORIZATION_FAILED", "PAYMENT_CAPTURE_FAILED", "ESTIMATE_EXPIRED", "AUTHORIZATION_EXPIRED"]},
+        "public_message": {"type": "string", "minLength": 1, "maxLength": 500},
+        "retryable": {"type": "boolean"}
+      }
+    },
+    "settlement": {"$ref": "#/$defs/settlement"}
+  },
+  "$defs": {
+    "settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "billable_minor_units", "currency"],
+      "properties": {
+        "action": {"enum": ["release_authorization", "no_capture", "refund"]},
+        "billable_minor_units": {"type": "integer", "minimum": 0},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+      }
+    }
+  }
+}
+

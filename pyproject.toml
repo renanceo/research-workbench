@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "research-workbench-gate0"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = ["jsonschema>=4.23,<5", "pypdf>=5,<7"]
+
+[project.optional-dependencies]
+test = []
+
+[tool.setuptools]
+packages = ["gate0"]
