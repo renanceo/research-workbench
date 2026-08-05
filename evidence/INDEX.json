@@ -19,6 +19,13 @@
       "provenance": "commit_bound_linux_run",
       "source_commit": "d1d3e96755d8c815420c16f1f2b59e5b8936d9be",
       "immutable": true
+    },
+    {
+      "run_id": "gate0-linux-20260805T103450Z",
+      "file": "GATE0_LINUX_RUN_20260805T103450Z.json",
+      "provenance": "commit_bound_linux_run_enhanced",
+      "source_commit": "c04deaf297186fdec74ee603ca1d0fc6f4173fb1",
+      "immutable": true
     }
   ]
 }
