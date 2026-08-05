@@ -105,12 +105,31 @@ def parse_pdf(path: Path, args: argparse.Namespace) -> dict[str, object]:
 
 def network_probe() -> dict[str, object]:
     try:
-        socket.create_connection(("127.0.0.1", 9), timeout=0.1)
+        socket.create_connection(("192.0.2.1", 9), timeout=0.1)
     except PermissionError:
         return {"network_denied": True}
     except OSError as exc:
+        if getattr(exc, "errno", None) in {1, 13, 51, 65, 101}:
+            return {"network_denied": True}
         return {"network_denied": False, "error_type": type(exc).__name__}
     return {"network_denied": False}
+
+
+def install_read_guard(roots: list[Path]) -> None:
+    protected = [root.absolute() for root in roots]
+
+    def audit(event: str, arguments: tuple[object, ...]) -> None:
+        if event != "open" or not arguments or not isinstance(arguments[0], (str, bytes)):
+            return
+        candidate = Path(arguments[0]).absolute()
+        for root in protected:
+            try:
+                candidate.relative_to(root)
+            except ValueError:
+                continue
+            raise PermissionError(f"parser read denied: {root}")
+
+    sys.addaudithook(audit)
 
 
 def main() -> int:
@@ -119,12 +138,14 @@ def main() -> int:
     parser.add_argument("--probe-network", action="store_true")
     parser.add_argument("--probe-environment", action="store_true")
     parser.add_argument("--probe-read", type=Path)
+    parser.add_argument("--forbid-read-root", action="append", type=Path, default=[])
     parser.add_argument("--max-file-bytes", type=int, default=20_000_000)
     parser.add_argument("--max-pages", type=int, default=200)
     parser.add_argument("--max-page-points", type=int, default=20_000)
     parser.add_argument("--max-text-chars", type=int, default=1_000_000)
     parser.add_argument("--max-decoded-bytes", type=int, default=100_000_000)
     args = parser.parse_args()
+    install_read_guard(args.forbid_read_root)
 
     if args.probe_network:
         payload = network_probe()

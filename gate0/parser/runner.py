@@ -25,6 +25,7 @@ class ParserLimits:
     memory_bytes: int = 512 * 1024 * 1024
     output_bytes: int = 2 * 1024 * 1024
     open_files: int = 32
+    process_count: int = 16
     max_file_bytes: int = 20_000_000
     max_pages: int = 200
     max_page_points: int = 20_000
@@ -42,6 +43,7 @@ def _limit_process(limits: ParserLimits) -> None:
     # Linux isolated runners enforce the hard address-space cap here.
     if sys.platform != "darwin":
         resource.setrlimit(resource.RLIMIT_AS, (limits.memory_bytes, limits.memory_bytes))
+        resource.setrlimit(resource.RLIMIT_NPROC, (limits.process_count, limits.process_count))
     resource.setrlimit(resource.RLIMIT_FSIZE, (limits.output_bytes, limits.output_bytes))
     resource.setrlimit(resource.RLIMIT_NOFILE, (limits.open_files, limits.open_files))
 
@@ -137,14 +139,16 @@ class IsolatedParser:
                 _sandbox_profile(workspace, self.python, self.forbidden_read_roots)
             )
 
-            command = [
-                "/usr/bin/sandbox-exec",
-                "-f",
-                str(profile),
-                str(self.python),
-                "-I",
-                str(WORKER),
-            ]
+            worker_command = [str(self.python), "-I", str(WORKER)]
+            if sys.platform == "darwin":
+                command = [
+                    "/usr/bin/sandbox-exec",
+                    "-f",
+                    str(profile),
+                    *worker_command,
+                ]
+            else:
+                command = worker_command
             if source is not None:
                 command.extend(
                     [
@@ -157,6 +161,8 @@ class IsolatedParser:
                     ]
                 )
             command.extend(extra_args or [])
+            for protected in self.forbidden_read_roots:
+                command.extend(["--forbid-read-root", str(protected)])
             completed = subprocess.run(
                 command,
                 cwd=workspace,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,7 +13,7 @@ from gate0.parser.runner import IsolatedParser, ParserLimits
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PYTHON = ROOT / ".venv" / "bin" / "python"
+PYTHON = Path(sys.executable)
 GATE0_001 = ROOT / "fixtures" / "security" / "GATE0-001-missing-font-text-budget.pdf"
 
 
