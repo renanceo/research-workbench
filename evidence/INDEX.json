@@ -26,6 +26,14 @@
       "provenance": "commit_bound_linux_run_enhanced",
       "source_commit": "c04deaf297186fdec74ee603ca1d0fc6f4173fb1",
       "immutable": true
+    },
+    {
+      "run_id": "gate0-report-security-20260805T105311Z",
+      "file": "GATE0_REPORT_SECURITY_RUN_20260805T105311Z.json",
+      "provenance": "commit_bound_integrated_report_security_run",
+      "source_commit": "bec4c3158aac886941fd1ed0eb6cd49281cbe4bc",
+      "aat_golden_case_authorized": true,
+      "immutable": true
     }
   ]
 }

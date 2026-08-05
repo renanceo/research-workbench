@@ -1,0 +1,150 @@
+{
+  "aat_golden_case_authorized": true,
+  "checks": {
+    "html_script_inert": true,
+    "human_review_revalidation": true,
+    "pdf_active_content_absent": true,
+    "raw_and_presentation_storage_isolation": true,
+    "raw_and_sanitized_hashes_distinct": true,
+    "schema_and_resource_rejection_before_persistence": true,
+    "unified_safe_semantics_across_ui_review_admin_export": true
+  },
+  "commands": {
+    "security_vector": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges:true",
+      "--pids-limit",
+      "64",
+      "--memory",
+      "768m",
+      "--memory-swap",
+      "768m",
+      "--cpus",
+      "1.0",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,size=128m",
+      "--ulimit",
+      "nofile=64:64",
+      "research-workbench-gate0:bec4c3158aac",
+      "python",
+      "scripts/report_security_vector.py"
+    ],
+    "tests": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges:true",
+      "--pids-limit",
+      "64",
+      "--memory",
+      "768m",
+      "--memory-swap",
+      "768m",
+      "--cpus",
+      "1.0",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,size=128m",
+      "--ulimit",
+      "nofile=64:64",
+      "research-workbench-gate0:bec4c3158aac",
+      "python",
+      "-m",
+      "unittest",
+      "tests.test_report_pipeline",
+      "-v"
+    ]
+  },
+  "complete_gate0": false,
+  "container_image": "research-workbench-gate0:bec4c3158aac",
+  "container_image_id": "sha256:0da99b06deb414d83fb6c3756ba9806c61075ee4738c9764a032648500f7c3fa",
+  "container_revision_label": "bec4c3158aac886941fd1ed0eb6cd49281cbe4bc",
+  "container_rootfs_layers": [
+    "sha256:709e0d49f62206f760d5392af4f1dab26c0017f4242f3975ffe0b2ce705f42e6",
+    "sha256:1e199a578ab2851f23a82b524b67cbffd0fce95e74db018e789fd5feafe1e308",
+    "sha256:53dd4f23a35fc751fa65d55ba98259f52982eccaed4a46ff75b0a9456d7cb08d",
+    "sha256:b7a71251b1d1cf9fda77c2f130985b743e8412028649d564fa74b399f1c11453",
+    "sha256:8eef6cd735889cab7b9810be9b657afc2bdc99db40588c36c8ced0d79105ef56",
+    "sha256:6369515bcbbbea1c73c249f49e0cf120bb06ab786e6fea63955a8853e0e78609",
+    "sha256:e7a170ab08df400d84e248e279af04cd95b66d9725999019783928f0f1a23957",
+    "sha256:bf3beae11debd9e5c19b8de4078e6405b66747a2c8ed4d8e4316f5a28a666e06",
+    "sha256:9c12f0f9475e541ce1e85782acf130f2dd7ee2ea2f02843c27a99bacf9d66be2",
+    "sha256:faef62d37efab9cfe8906101e2d5e12346c0e8b0befa64388d2fae43cb4ad590",
+    "sha256:4f733cc5b2af6f0ec7f51f2254df61a9965ff81bd80d6a6b104afbbc74bdb332",
+    "sha256:eb26f8fa6be4106e4c9d94264ee6ec574bced2dbf09238b60d6f99e6eb5a662d"
+  ],
+  "environment_category": "local_colima_linux_isolated_container",
+  "executed_at": "2026-08-05T10:53:11Z",
+  "fixture_sha256": {
+    "fixtures/report-security/ATTACKS_v1.json": "0930535ca01b3b69ba3976eb6982bd20dda88afcae83f7ab20b8a00f8c8d7c6e"
+  },
+  "gate1_configuration_modified": false,
+  "public_paid_launch_authorized": false,
+  "result": "pass",
+  "run_id": "gate0-report-security-20260805T105311Z",
+  "security_vector": {
+    "assertions": {
+      "pdf_has_no_active_content": true,
+      "raw_and_presentation_databases_separate": true,
+      "raw_and_sanitized_hashes_are_distinct": true,
+      "safe_body_equal_across_all_paths": true,
+      "script_not_executable_in_html": true,
+      "semantic_equal_after_human_resave": true
+    },
+    "attack_fixture_id": "RS-009-export-differential",
+    "hashes": {
+      "admin_document": "fe66fdc0fa850a017c7ab4107094c950fac95b6c9c5c6b63b4528b639ee1f5ef",
+      "canonical_semantic": "07fd576f2defa8540506a41d0b86069bdee9df52e43a73ac798022641176b520",
+      "html_export": "22dbde525ca5784da93286dff7dd183d339fce8bd5f972d1882c83010b0fe606",
+      "human_resave_html": "22dbde525ca5784da93286dff7dd183d339fce8bd5f972d1882c83010b0fe606",
+      "human_resave_semantic": "07fd576f2defa8540506a41d0b86069bdee9df52e43a73ac798022641176b520",
+      "human_review_document": "ff2559efec1c73ba86458e989b306025d25007ee43ce178d38397bbd7866657c",
+      "pdf_export": "da4062511743139792624485dbe5c3426e56a848182ee1023c962e1aaca6b7c5",
+      "raw_output": "03e605bb00da47d1819de19cfea6d0d6b0082bc27d7eaf56d75af97eabdaec05",
+      "safe_body_by_path": {
+        "admin": "846c201e171d73b28fd6a9946eb0ab13f5097b9bdbe43722eb0726d614627282",
+        "html_export": "846c201e171d73b28fd6a9946eb0ab13f5097b9bdbe43722eb0726d614627282",
+        "human_resave": "846c201e171d73b28fd6a9946eb0ab13f5097b9bdbe43722eb0726d614627282",
+        "human_review": "846c201e171d73b28fd6a9946eb0ab13f5097b9bdbe43722eb0726d614627282",
+        "ui": "846c201e171d73b28fd6a9946eb0ab13f5097b9bdbe43722eb0726d614627282"
+      },
+      "ui_document": "4d171766630c6ed1febbe652ec0fe1fb903137d9c30dfa6ad91b7a0793213d32"
+    },
+    "vector_id": "report-security-vector-1.0",
+    "versions": {
+      "html_renderer": "safe-html-renderer-1.0",
+      "pdf_exporter": "safe-pdf-exporter-1.0",
+      "pipeline": "report-pipeline-1.0",
+      "sanitizer": "plain-text-sanitizer-1.0",
+      "schema": "positioning-diagnostic-1.0"
+    }
+  },
+  "source_commit": "bec4c3158aac886941fd1ed0eb6cd49281cbe4bc",
+  "source_tree_manifest_sha256": "57e045a45928f78fa226598bbfe5a3eaf9987750538150159f9ad17430e6690d",
+  "test_result": {
+    "passed": true,
+    "returncode": 0,
+    "stderr_sha256": "08c8f0e136d9ceb921c782c270d93229091605f897fe7a5ea8f194ab067b79f3",
+    "tests_run": 10
+  },
+  "versions": {
+    "html_renderer": "safe-html-renderer-1.0",
+    "pdf_exporter": "safe-pdf-exporter-1.0",
+    "pipeline": "report-pipeline-1.0",
+    "sanitizer": "plain-text-sanitizer-1.0",
+    "schema": "positioning-diagnostic-1.0"
+  }
+}
