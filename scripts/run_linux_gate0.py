@@ -277,9 +277,9 @@ def main() -> int:
             "residue": json_output(residue_check),
         },
         "result": "pass" if passed else "fail",
-        "complete_gate0": false,
-        "aat_authorized": false,
-        "public_paid_launch_authorized": false,
+        "complete_gate0": False,
+        "aat_authorized": False,
+        "public_paid_launch_authorized": False,
     }
     output_path = ROOT / "evidence" / f"GATE0_LINUX_RUN_{now.strftime('%Y%m%dT%H%M%SZ')}.json"
     output_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
@@ -290,4 +290,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
