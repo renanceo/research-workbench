@@ -5,6 +5,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 import subprocess
 import time
 import uuid
@@ -148,7 +149,9 @@ def main() -> int:
 
     unit_args = restricted_run_args(image)
     unit_result = command(unit_args, timeout=180)
-    unit_pass = unit_result.returncode == 0 and "Ran 40 tests" in unit_result.stderr and "OK" in unit_result.stderr
+    unit_count_match = re.search(r"Ran (\d+) tests", unit_result.stderr)
+    unit_test_count = int(unit_count_match.group(1)) if unit_count_match else 0
+    unit_pass = unit_result.returncode == 0 and unit_test_count >= 40 and "OK" in unit_result.stderr
 
     isolation_args = restricted_run_args(image)
     isolation_args.extend(["python", "linux/exhaustion_worker.py", "isolation"])
@@ -255,7 +258,8 @@ def main() -> int:
             (
                 "import importlib.metadata as m,json,platform;"
                 "print(json.dumps({'python':platform.python_version(),"
-                "'jsonschema':m.version('jsonschema'),'pypdf':m.version('pypdf')}))"
+                "'jsonschema':m.version('jsonschema'),'pypdf':m.version('pypdf'),"
+                "'reportlab':m.version('reportlab')}))"
             ),
         ]
     )
@@ -301,6 +305,7 @@ def main() -> int:
         "checks": checks,
         "observations": {
             "unit_test_returncode": unit_result.returncode,
+            "unit_test_count": unit_test_count,
             "unit_test_stderr_sha256": sha256_text(unit_result.stderr),
             "isolation": isolation,
             "memory": {"returncode": memory_result.returncode, "state": memory_state},
