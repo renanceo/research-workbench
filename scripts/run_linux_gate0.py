@@ -181,7 +181,12 @@ def main() -> int:
         memory="128m",
         extra=["--ulimit", "fsize=1048576:1048576"],
     )
-    output_pass = output_result.returncode != 0 and int(output_state.get("ExitCode", 0)) != 0
+    output_limit_observed = "File too large" in output_result.stderr or "Errno 27" in output_result.stderr
+    output_pass = (
+        output_result.returncode != 0
+        and int(output_state.get("ExitCode", 0)) != 0
+        and output_limit_observed
+    )
 
     wall_name = f"gate0-wall-{uuid.uuid4().hex[:10]}"
     wall_args = restricted_run_args(
@@ -235,6 +240,27 @@ def main() -> int:
 
     tracked_tree = require(["git", "ls-tree", "-r", commit_id])
     fixture_lines = require(["git", "ls-tree", "-r", commit_id, "fixtures"])
+    fixture_paths = require(
+        ["git", "ls-tree", "-r", "--name-only", commit_id, "fixtures"]
+    ).splitlines()
+    fixture_sha256 = {
+        path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        for path in fixture_paths
+    }
+    runtime_args = restricted_run_args(image)
+    runtime_args.extend(
+        [
+            "python",
+            "-c",
+            (
+                "import importlib.metadata as m,json,platform;"
+                "print(json.dumps({'python':platform.python_version(),"
+                "'jsonschema':m.version('jsonschema'),'pypdf':m.version('pypdf')}))"
+            ),
+        ]
+    )
+    runtime = json.loads(require(runtime_args))
+    base_image = json.loads(require(["docker", "image", "inspect", "python:3.11-slim-bookworm"]))[0]
     now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
     evidence = {
         "run_id": f"gate0-linux-{now.strftime('%Y%m%dT%H%M%SZ')}",
@@ -243,14 +269,22 @@ def main() -> int:
         "commit_id": commit_id,
         "source_tree_manifest_sha256": sha256_text(tracked_tree),
         "fixture_git_manifest_sha256": sha256_text(fixture_lines),
+        "fixture_sha256": fixture_sha256,
         "container_image": image,
         "container_image_id": image_inspect["Id"],
+        "container_rootfs_layers": image_inspect["RootFS"]["Layers"],
         "container_revision_label": revision,
+        "base_image": {
+            "reference": "python:3.11-slim-bookworm",
+            "image_id": base_image["Id"],
+            "repo_digests": base_image.get("RepoDigests", []),
+        },
         "docker_version": require(["docker", "version", "--format", "{{.Server.Version}}"]),
         "linux_kernel": require(
             restricted_run_args(image) + ["python", "-c", "import platform; print(platform.release())"]
         ),
         "contract_versions": {"public_contract": "1.0", "parser_output": "parser-output-1.0"},
+        "runtime": runtime,
         "commands": {
             "unit_tests": unit_args,
             "isolation": isolation_args,
@@ -262,6 +296,7 @@ def main() -> int:
             "wall_clock": wall_args,
             "residue_write": residue_write_args,
             "residue_check": residue_check_args,
+            "runtime": runtime_args,
         },
         "checks": checks,
         "observations": {
@@ -272,7 +307,12 @@ def main() -> int:
             "cpu": {"returncode": cpu_result.returncode, "state": cpu_state},
             "pids": {"returncode": pids_result.returncode, "state": pids_state, "payload": pids_payload},
             "disk": {"returncode": disk_result.returncode, "state": disk_state, "payload": disk_payload},
-            "output": {"returncode": output_result.returncode, "state": output_state},
+            "output": {
+                "returncode": output_result.returncode,
+                "state": output_state,
+                "file_too_large_observed": output_limit_observed,
+                "stderr_sha256": sha256_text(output_result.stderr),
+            },
             "wall_clock": {"timeout_triggered": wall_timeout_triggered, "elapsed_seconds": elapsed, "state": wall_state},
             "residue": json_output(residue_check),
         },
