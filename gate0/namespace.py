@@ -27,6 +27,17 @@ class ResourceType(str, Enum):
     EXPORT = "export"
 
 
+RESOURCE_ID_PREFIX = {
+    ResourceType.DOCUMENT: "doc",
+    ResourceType.DIAGNOSTIC: "diag",
+    ResourceType.REPORT: "report",
+    ResourceType.PARSER_OUTPUT: "parse",
+    ResourceType.RETRIEVAL_NAMESPACE: "retr",
+    ResourceType.HUMAN_REVIEW: "review",
+    ResourceType.EXPORT: "export",
+}
+
+
 @dataclass(frozen=True)
 class Resource:
     resource_id: str
@@ -59,7 +70,7 @@ class NamespaceStore:
     ) -> Resource:
         if parent_id is not None:
             self.get(account_id, parent_id)
-        prefix = resource_type.value[:4]
+        prefix = RESOURCE_ID_PREFIX[resource_type]
         resource = Resource(
             resource_id=f"{prefix}_{secrets.token_urlsafe(18)}",
             resource_type=resource_type,
@@ -143,4 +154,3 @@ class NamespaceStore:
         if resource_id != grant.resource_id or action not in grant.actions:
             raise ResourceNotFound("resource not found")
         return self.get(grant.account_id, resource_id)
-

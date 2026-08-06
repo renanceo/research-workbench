@@ -1,0 +1,18 @@
+{
+  "snapshot_id": "fs_aat_biosystems_20260806",
+  "retrieved_at": "2026-08-06T00:00:00Z",
+  "facts": [
+    {
+      "venue_id": "venue_biosystems",
+      "fact_type": "scope",
+      "value": "BioSystems accepts theoretical and computational work linking biology, evolutionary concepts, information sciences, biological organization, and complex biological systems.",
+      "source_url": "https://www.sciencedirect.com/journal/biosystems/publish/guide-for-authors",
+      "source_excerpt": "BioSystems encourages theoretical, computational, and experimental articles that link biology, evolutionary concepts, and the information sciences. Its scope includes biological complexity, theoretical biology, artificial life, computational modeling of complex biological systems, and simulation of genetic and ecological systems.",
+      "source_locator": "Guide for authors > About the journal > Aims and scope",
+      "retrieved_at": "2026-08-06T00:00:00Z",
+      "content_hash": "sha256:f868d07c21205d571d5703a57f8456435c900ca32b63582d030691ae66791ab4",
+      "valid_until": "2026-09-05T00:00:00Z",
+      "verification_status": "verified"
+    }
+  ]
+}
