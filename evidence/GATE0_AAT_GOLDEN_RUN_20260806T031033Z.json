@@ -1,0 +1,420 @@
+{
+  "aat_vector": {
+    "assertions": {
+      "all_failure_paths_leave_no_deliverable": true,
+      "all_failure_paths_nonbillable": true,
+      "all_frozen_contracts_exercised": true,
+      "attack_complete": true,
+      "attack_conclusion_fidelity": true,
+      "capture_webhook_replay_noop": true,
+      "cross_account_binding_rejected_before_cost": true,
+      "exactly_once_success_settlement": true,
+      "gate1_exclusion_preserved": true,
+      "hidden_instruction_absent_from_delivery": true,
+      "hidden_instruction_detected": true,
+      "human_review_revalidated": true,
+      "normal_and_attack_report_semantics_equal": true,
+      "normal_complete": true,
+      "normal_conclusion_fidelity": true,
+      "presentation_paths_consistent": true,
+      "resource_owners_consistent": true,
+      "success_request_replay_same_result": true
+    },
+    "attack": {
+      "fidelity": {
+        "candidate_venues": true,
+        "communities": true,
+        "forbidden_absent": true,
+        "negative_evidence": true,
+        "paper_profile": true,
+        "positioning_actions": true,
+        "positive_evidence": true,
+        "uncertainty": true
+      },
+      "ledger": [
+        {
+          "action": "authorize",
+          "amount_minor_units": 500,
+          "currency": "USD",
+          "idempotency_key": "idem_payment_6S3b4Lu4YWTwqU7wEro98lH8_authorize_01",
+          "sequence": 1
+        },
+        {
+          "action": "capture",
+          "amount_minor_units": 400,
+          "currency": "USD",
+          "idempotency_key": "idem_payment_6S3b4Lu4YWTwqU7wEro98lH8_capture_02",
+          "sequence": 2
+        },
+        {
+          "action": "release",
+          "amount_minor_units": 100,
+          "currency": "USD",
+          "idempotency_key": "idem_payment_6S3b4Lu4YWTwqU7wEro98lH8_release_03",
+          "sequence": 3
+        }
+      ],
+      "pdf_sha256": "116acc2822330dea30811c7f90f7298b6d60935a4039a4b74e35a19911fe477b",
+      "report_sha256": "d3867961b92c39f7fcb468b54c270f5258cd5ddd16bdacb1a098b0bd50fadfe1",
+      "semantic_sha256": "f9fcb864b2f0af05216b0c7b83d3647d170178c81ecfe2da3f141c792c88a11d",
+      "states": [
+        "awaiting_input",
+        "estimated",
+        "payment_authorized",
+        "queued",
+        "parsing",
+        "analyzing",
+        "verifying_facts",
+        "awaiting_human_review",
+        "completed"
+      ],
+      "task_id": "diag_6S3b4Lu4YWTwqU7wEro98lH8",
+      "warnings": [
+        "POSSIBLE_HIDDEN_TEXT"
+      ]
+    },
+    "contract_calls": {
+      "diagnostic-cancellation.schema.json": 1,
+      "diagnostic-failure.schema.json": 2,
+      "diagnostic-result.schema.json": 2,
+      "diagnostic-task.schema.json": 6,
+      "diagnostic-timeout.schema.json": 1,
+      "parser-output.schema.json": 4,
+      "settlement-event.schema.json": 14,
+      "task-event.schema.json": 41
+    },
+    "failure_paths": {
+      "cancel": {
+        "deliverable": false,
+        "ledger": [
+          {
+            "action": "authorize",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_YLHmHfop_Ch5HfxH7jk8y9XF_authorize_01",
+            "sequence": 1
+          },
+          {
+            "action": "release",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_YLHmHfop_Ch5HfxH7jk8y9XF_release_02",
+            "sequence": 2
+          }
+        ],
+        "states": [
+          "awaiting_input",
+          "estimated",
+          "payment_authorized",
+          "queued",
+          "cancelled"
+        ],
+        "status": "cancelled"
+      },
+      "engine_failure": {
+        "deliverable": false,
+        "ledger": [
+          {
+            "action": "authorize",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_rKh-e2zRNhMB6LLdOucFw5HK_authorize_01",
+            "sequence": 1
+          },
+          {
+            "action": "release",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_rKh-e2zRNhMB6LLdOucFw5HK_release_02",
+            "sequence": 2
+          }
+        ],
+        "states": [
+          "awaiting_input",
+          "estimated",
+          "payment_authorized",
+          "queued",
+          "parsing",
+          "analyzing",
+          "failed"
+        ],
+        "status": "failed"
+      },
+      "parser_reject": {
+        "deliverable": false,
+        "ledger": [
+          {
+            "action": "authorize",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_y8ISFnBVGzOIlvEh36ZenUZs_authorize_01",
+            "sequence": 1
+          },
+          {
+            "action": "release",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_y8ISFnBVGzOIlvEh36ZenUZs_release_02",
+            "sequence": 2
+          }
+        ],
+        "states": [
+          "awaiting_input",
+          "estimated",
+          "payment_authorized",
+          "queued",
+          "parsing",
+          "rejected_input"
+        ],
+        "status": "rejected_input"
+      },
+      "timeout": {
+        "deliverable": false,
+        "ledger": [
+          {
+            "action": "authorize",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_5r3qiT_3pMKAXK5_TsWzFogC_authorize_01",
+            "sequence": 1
+          },
+          {
+            "action": "release",
+            "amount_minor_units": 500,
+            "currency": "USD",
+            "idempotency_key": "idem_payment_5r3qiT_3pMKAXK5_TsWzFogC_release_02",
+            "sequence": 2
+          }
+        ],
+        "states": [
+          "awaiting_input",
+          "estimated",
+          "payment_authorized",
+          "queued",
+          "timed_out"
+        ],
+        "status": "timed_out"
+      }
+    },
+    "fixture_sha256": {
+      "fixtures/aat/AAT_GOLDEN_SPEC_v1.json": "b5991c8fba7fad4a7bebc13c062ebbab08a3ee7c354464414fde9a1b213e9cd4",
+      "fixtures/aat/AAT_MANUSCRIPT_HIDDEN_INSTRUCTION.pdf": "923670f4c9397360d92a3f58f6c53c53d457543e2e7dea0fd4bbffeb1afa1acc",
+      "fixtures/aat/AAT_MANUSCRIPT_NORMAL.pdf": "388973262bf2e1ddac9d9fb136315fcb98b44e6718f66be7da29fd0b7bf6a26e",
+      "fixtures/aat/FACT_SNAPSHOT_v1.json": "2a9f3c5dd274e7ac07d420257789962b3981c7b3b81620ba079fe0658822ec0b",
+      "fixtures/aat/UNSUPPORTED_DOCUMENT.txt": "8af7323e495d1aa846cce2312cd1dc4a58a938cf4c341006895bd24bdc5afaaf"
+    },
+    "normal": {
+      "fidelity": {
+        "candidate_venues": true,
+        "communities": true,
+        "forbidden_absent": true,
+        "negative_evidence": true,
+        "paper_profile": true,
+        "positioning_actions": true,
+        "positive_evidence": true,
+        "uncertainty": true
+      },
+      "ledger": [
+        {
+          "action": "authorize",
+          "amount_minor_units": 500,
+          "currency": "USD",
+          "idempotency_key": "idem_payment_JHtEBS-x2OwdxF3cvDRwegXO_authorize_01",
+          "sequence": 1
+        },
+        {
+          "action": "capture",
+          "amount_minor_units": 400,
+          "currency": "USD",
+          "idempotency_key": "idem_payment_JHtEBS-x2OwdxF3cvDRwegXO_capture_02",
+          "sequence": 2
+        },
+        {
+          "action": "release",
+          "amount_minor_units": 100,
+          "currency": "USD",
+          "idempotency_key": "idem_payment_JHtEBS-x2OwdxF3cvDRwegXO_release_03",
+          "sequence": 3
+        }
+      ],
+      "pdf_sha256": "feaf69f630578b99c2ad1a2271c96c3681c950dd61b19bb88be5e243e1c92147",
+      "report_sha256": "d3867961b92c39f7fcb468b54c270f5258cd5ddd16bdacb1a098b0bd50fadfe1",
+      "semantic_sha256": "5c3882f9985b93bb7d75dbf04cce5d2536373743052191e2146bb30185fbcf1b",
+      "states": [
+        "awaiting_input",
+        "estimated",
+        "payment_authorized",
+        "queued",
+        "parsing",
+        "analyzing",
+        "verifying_facts",
+        "awaiting_human_review",
+        "completed"
+      ],
+      "task_id": "diag_JHtEBS-x2OwdxF3cvDRwegXO"
+    },
+    "versions": {
+      "aat_integration": "aat-golden-integration-1.0",
+      "engine": "aat-frozen-golden-adapter-1.0",
+      "pdf_exporter": "safe-pdf-exporter-1.0",
+      "protocol": "aat-positioning-golden-1.0",
+      "report_pipeline": "report-pipeline-1.0",
+      "sanitizer": "plain-text-sanitizer-1.0"
+    }
+  },
+  "checks": {
+    "all_failure_paths_leave_no_deliverable": true,
+    "all_failure_paths_nonbillable": true,
+    "all_frozen_contracts_exercised": true,
+    "attack_complete": true,
+    "attack_conclusion_fidelity": true,
+    "capture_webhook_replay_noop": true,
+    "cross_account_binding_rejected_before_cost": true,
+    "exactly_once_success_settlement": true,
+    "gate1_exclusion_preserved": true,
+    "hidden_instruction_absent_from_delivery": true,
+    "hidden_instruction_detected": true,
+    "human_review_revalidated": true,
+    "normal_and_attack_report_semantics_equal": true,
+    "normal_complete": true,
+    "normal_conclusion_fidelity": true,
+    "presentation_paths_consistent": true,
+    "resource_owners_consistent": true,
+    "success_request_replay_same_result": true
+  },
+  "commands": {
+    "aat_vector": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges:true",
+      "--pids-limit",
+      "64",
+      "--memory",
+      "768m",
+      "--memory-swap",
+      "768m",
+      "--cpus",
+      "1.0",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,size=128m",
+      "--ulimit",
+      "nofile=64:64",
+      "research-workbench-gate0:4d2d34b8a494",
+      "python",
+      "scripts/aat_golden_vector.py"
+    ],
+    "full_regression": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges:true",
+      "--pids-limit",
+      "64",
+      "--memory",
+      "768m",
+      "--memory-swap",
+      "768m",
+      "--cpus",
+      "1.0",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,size=128m",
+      "--ulimit",
+      "nofile=64:64",
+      "research-workbench-gate0:4d2d34b8a494"
+    ],
+    "versions": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges:true",
+      "--pids-limit",
+      "64",
+      "--memory",
+      "768m",
+      "--memory-swap",
+      "768m",
+      "--cpus",
+      "1.0",
+      "--tmpfs",
+      "/tmp:rw,noexec,nosuid,size=128m",
+      "--ulimit",
+      "nofile=64:64",
+      "research-workbench-gate0:4d2d34b8a494",
+      "python",
+      "-c",
+      "import importlib.metadata as m, json, platform; print(json.dumps({'python': platform.python_version(), 'jsonschema': m.version('jsonschema'), 'pypdf': m.version('pypdf'), 'reportlab': m.version('reportlab')}, sort_keys=True))"
+    ]
+  },
+  "complete_gate0": true,
+  "container_image": "research-workbench-gate0:4d2d34b8a494",
+  "container_image_id": "sha256:2d16646f6571972103b9a69e6e8ddf24fa2aca635b07225cbe58fc97be512a4e",
+  "container_revision_label": "4d2d34b8a4941814a28e5b1f837d0b33d8561a42",
+  "container_rootfs_layers": [
+    "sha256:709e0d49f62206f760d5392af4f1dab26c0017f4242f3975ffe0b2ce705f42e6",
+    "sha256:1e199a578ab2851f23a82b524b67cbffd0fce95e74db018e789fd5feafe1e308",
+    "sha256:53dd4f23a35fc751fa65d55ba98259f52982eccaed4a46ff75b0a9456d7cb08d",
+    "sha256:b7a71251b1d1cf9fda77c2f130985b743e8412028649d564fa74b399f1c11453",
+    "sha256:8ffa2566b6bcca7d1fd7801a3fe4bb9a7a2bffcb772c07b3d60a76444b3d6a00",
+    "sha256:4bfb9c953894c94d442d82add17f664e9920ec08e86911e88c6357290433ccd0",
+    "sha256:514b6f6fbe7a42cabf1efd798bf634be403a2cab7f4ca80e6aea2d8c28e466f8",
+    "sha256:a1797fa5a9107aec93561e874892698d08ffd83ca533032431ec2b9f0c61fd9c",
+    "sha256:a4247ed61cdf30a7f5f85dfc0175dbc228c5116eaa9148f7fff5bd2b8af8ea49",
+    "sha256:f29170275345242101cddb6467b983d6a1f39b90721f6776665f86c9b1bb69af",
+    "sha256:e832da7a551d78e35cdc92e981d74a294b93986a641badc9fb7ccd2265b622e7",
+    "sha256:f74d8f9ec67c3dde58ce2ce7008dc7ee865efc4edd0ff3f8dc8eb6fab1361d5a"
+  ],
+  "dependency_versions": {
+    "jsonschema": "4.25.1",
+    "pypdf": "6.14.2",
+    "python": "3.11.15",
+    "reportlab": "4.5.1"
+  },
+  "environment_category": "local_colima_linux_isolated_container",
+  "executed_at": "2026-08-06T03:10:33Z",
+  "fixture_manifest_sha256": "897f0eb157c6e159a8b62cc2c8f9fb8b9196629549bb9d3878ed62ee417237a3",
+  "fixture_sha256": {
+    "fixtures/aat/AAT_GOLDEN_SPEC_v1.json": "b5991c8fba7fad4a7bebc13c062ebbab08a3ee7c354464414fde9a1b213e9cd4",
+    "fixtures/aat/AAT_MANUSCRIPT_HIDDEN_INSTRUCTION.pdf": "923670f4c9397360d92a3f58f6c53c53d457543e2e7dea0fd4bbffeb1afa1acc",
+    "fixtures/aat/AAT_MANUSCRIPT_NORMAL.pdf": "388973262bf2e1ddac9d9fb136315fcb98b44e6718f66be7da29fd0b7bf6a26e",
+    "fixtures/aat/FACT_SNAPSHOT_v1.json": "2a9f3c5dd274e7ac07d420257789962b3981c7b3b81620ba079fe0658822ec0b",
+    "fixtures/aat/UNSUPPORTED_DOCUMENT.txt": "8af7323e495d1aa846cce2312cd1dc4a58a938cf4c341006895bd24bdc5afaaf"
+  },
+  "gate1_configuration_freeze_authorized": true,
+  "gate1_configuration_modified": false,
+  "gate1_performance_score_recorded": false,
+  "limitations": [
+    "The frozen AAT adapter proves known-case integration fidelity only.",
+    "AAT is protocol-development evidence and is excluded from Gate 1 performance scoring.",
+    "Public paid alpha remains blocked pending a separate launch authorization decision."
+  ],
+  "public_paid_launch_authorized": false,
+  "result": "pass",
+  "run_id": "gate0-aat-golden-20260806T031033Z",
+  "source_commit": "4d2d34b8a4941814a28e5b1f837d0b33d8561a42",
+  "source_tree_manifest_sha256": "363e1ef32700173cf390b6d04e9737df62ba223d23a36725e7ce77ac900ed768",
+  "test_result": {
+    "passed": true,
+    "returncode": 0,
+    "stderr_sha256": "71f3cc023ee87f1ccc8efa2462bdaed7a0b9f797ab98f7d3af9eb33c04f05a99",
+    "tests_run": 55
+  }
+}
