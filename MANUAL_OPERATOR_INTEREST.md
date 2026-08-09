@@ -23,6 +23,16 @@ A suitable candidate should:
 No professorial title is required. The project is recruiting one qualified
 person, not creating an operator pool.
 
+## Compensation and scholarly credit
+
+This is currently an unfunded, unpaid, bounded evaluation role. Participation
+does not guarantee authorship. Contributions will be documented using the
+CRediT taxonomy and acknowledged with the contributor's consent. If the
+operator later makes substantive intellectual contributions to a metascience
+study, authorship will be assessed under the target journal's policy. Credit is
+never contingent on agreement with the product, model outputs, or benchmark
+outcome.
+
 ## Independence and confidentiality
 
 Before qualification, the candidate must attest that they:
@@ -77,4 +87,3 @@ Do not post legal identity documents, confidential manuscripts, unpublished
 reviews, employer records, or other sensitive evidence in a public issue.
 Additional verification, if needed, is handled privately by the benchmark
 custodian.
-

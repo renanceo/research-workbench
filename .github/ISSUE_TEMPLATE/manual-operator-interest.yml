@@ -1,0 +1,67 @@
+name: Manual operator expression of interest
+description: Apply for the one independent Gate 1 manual-operator role.
+title: "[Operator EOI] "
+labels:
+  - manual-operator-interest
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is an unfunded, unpaid, bounded research-evaluation role. Participation does not guarantee authorship. Do not post legal identity documents, confidential manuscripts, unpublished reviews, or employer records. Read MANUAL_OPERATOR_INTEREST.md before continuing.
+  - type: input
+    id: operator_handle
+    attributes:
+      label: Stable public handle
+      description: Use a stable pseudonym; do not post identity documents.
+    validations:
+      required: true
+  - type: textarea
+    id: research_experience
+    attributes:
+      label: Research experience
+      description: Give a short, non-confidential summary.
+    validations:
+      required: true
+  - type: textarea
+    id: submission_review_experience
+    attributes:
+      label: Submission or review experience
+      description: Summarize relevant paper submission, review, editing, or evaluation work without sharing confidential reviews.
+    validations:
+      required: true
+  - type: input
+    id: relevant_fields
+    attributes:
+      label: Relevant fields
+      description: List the theoretical, computational, or interdisciplinary fields you know best.
+    validations:
+      required: true
+  - type: input
+    id: availability
+    attributes:
+      label: Availability
+      description: Give a brief availability window; exact workload is disclosed before qualification.
+    validations:
+      required: true
+  - type: checkboxes
+    id: independence
+    attributes:
+      label: Independence attestations
+      options:
+        - label: I did not participate in this evaluation's prompt, private-profile, threshold, or calibration development.
+          required: true
+        - label: I have not seen model-system smoke outputs, formal cases, judge answers, or sealed commitments.
+          required: true
+        - label: I will not judge any formal case that I operate.
+          required: true
+        - label: I understand that qualification is procedural and does not depend on agreement with product or model conclusions.
+          required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Current role terms
+      options:
+        - label: I understand that this role is currently unpaid and that participation does not guarantee authorship.
+          required: true
+        - label: I understand that any credit is based on actual contribution and is never contingent on benchmark outcome.
+          required: true

@@ -1,0 +1,87 @@
+{
+  "contract_version": "1.0",
+  "metering": {
+    "allocated_variable_cost_minor_units": 0,
+    "currency": "USD",
+    "provider_cost_minor_units": 0,
+    "retrieval_cost_minor_units": 0
+  },
+  "report": {
+    "abstentions": [
+      "No acceptance-probability estimate.",
+      "No claim that any venue is uniquely best."
+    ],
+    "candidate_venues": [
+      {
+        "negative_evidence": [
+          "The fictional evidence base is deliberately small."
+        ],
+        "positive_evidence": [
+          "The fictional venue scope explicitly includes simulated lattice dynamics."
+        ],
+        "uncertainty": "moderate",
+        "validated_coverage": true,
+        "venue_id": "venue_example_a",
+        "venue_name": "Example Venue A"
+      }
+    ],
+    "community_map": [
+      "Synthetic computational dynamics",
+      "Fictional lattice-organism methods"
+    ],
+    "coverage_limitations": [
+      "Entirely synthetic public-preview fixture; no real paper or venue judgment.",
+      "The mock result demonstrates report structure, not product effectiveness."
+    ],
+    "current_facts": [
+      {
+        "content_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "fact_type": "scope",
+        "retrieved_at": "2026-08-09T00:00:00Z",
+        "source_excerpt": "Synthetic official scope text for a fictional venue.",
+        "source_locator": "synthetic-page > scope",
+        "source_url": "https://official-publisher.example/venue-a/scope",
+        "valid_until": "2026-09-09T00:00:00Z",
+        "value": "Fictional scope covering simulated lattice dynamics.",
+        "venue_id": "venue_example_a",
+        "verification_status": "verified"
+      }
+    ],
+    "not_recommended": [
+      {
+        "negative_evidence": [
+          "The fictional manuscript contains no empirical field observations required by this fictional venue."
+        ],
+        "positive_evidence": [
+          "Surface vocabulary overlaps with pattern formation."
+        ],
+        "uncertainty": "high",
+        "validated_coverage": false,
+        "venue_id": "venue_example_b",
+        "venue_name": "Example Venue B"
+      }
+    ],
+    "paper_profile": {
+      "contribution_shape": "A fictional comparison of two reversible update rules.",
+      "evidence_shape": "Synthetic simulations with invented controls.",
+      "method": "Fictional lattice simulation.",
+      "question": "How do reversible rules change patterns in simulated lattice organisms?",
+      "uncertainty": "All manuscript and venue content is fictional."
+    },
+    "positioning_actions": [
+      "In the fictional example, clarify which simulated mechanism drives the reported pattern."
+    ],
+    "positioning_risks": [
+      "Surface terminology could make the fictional paper appear relevant to a venue whose evidence requirements it does not meet."
+    ]
+  },
+  "status": "completed",
+  "task_id": "diag_publicpreview01",
+  "versions": {
+    "engine": "synthetic-public-preview-1.0",
+    "fact_snapshot": "fs_synthetic_public_preview_001",
+    "knowledge_release": "kr_synthetic_public_preview_001",
+    "protocol": "synthetic-demo-shape-1.0",
+    "report_schema": "positioning-diagnostic-1.0"
+  }
+}

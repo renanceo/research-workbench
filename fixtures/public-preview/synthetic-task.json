@@ -1,0 +1,25 @@
+{
+  "authorization": {
+    "currency": "USD",
+    "estimate_id": "est_publicpreview01",
+    "maximum_billable_minor_units": 1
+  },
+  "contract_version": "1.0",
+  "idempotency_key": "idem_publicpreview_submit_0001",
+  "input": {
+    "candidate_venues": [
+      "venue_example_a",
+      "venue_example_b"
+    ],
+    "decision_constraints": {
+      "notes": "Synthetic public-preview fixture; no real manuscript and no charge.",
+      "priority": "fit",
+      "target_date": null
+    },
+    "document_id": "doc_publicpreview01",
+    "document_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "language": "en"
+  },
+  "task_id": "diag_publicpreview01",
+  "task_type": "paper_positioning_diagnostic"
+}
