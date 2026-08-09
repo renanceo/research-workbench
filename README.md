@@ -27,3 +27,11 @@ with an isolated runner or container that also enforces a hard memory limit.
 
 The contracts are frozen as `contract_version: 1.0`. A breaking change requires
 a new contract version; it must not overwrite v1 or prior run evidence.
+
+## Research participation
+
+Gate 1 currently needs one independent manual paper-positioning operator. See
+[MANUAL_OPERATOR_INTEREST.md](MANUAL_OPERATOR_INTEREST.md) for the public
+eligibility and conflict rules. The private protocol, evaluation cases,
+prompts, profiles, thresholds, calibration records, and judge materials are not
+part of this repository or the public qualification intake.
