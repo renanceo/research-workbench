@@ -67,8 +67,12 @@ class ParserIsolationTests(unittest.TestCase):
             handle.write(b"\n% synthetic adversarial object\n" + marker + b"\n")
         return path
 
+    # CI's isolated-container job sets RW_REQUIRE_NETWORK_ISOLATION=1 so this
+    # test can never silently skip there: it runs, and fails if not isolated.
     @unittest.skipIf(
-        sys.platform != "darwin" and not _linux_network_isolated(),
+        sys.platform != "darwin"
+        and not _linux_network_isolated()
+        and os.environ.get("RW_REQUIRE_NETWORK_ISOLATION") != "1",
         "parser network isolation needs macOS sandbox-exec or a no-network "
         "container (docker run --network none, as in scripts/run_linux_gate0.py); "
         "this Linux host has non-loopback interfaces and no parser sandbox",
