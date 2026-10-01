@@ -22,7 +22,7 @@ Run the evidence suite:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install 'jsonschema>=4.23,<5' 'pypdf>=5,<7'
+.venv/bin/python -m pip install 'jsonschema>=4.23,<5' 'pypdf>=5,<7' 'reportlab>=4,<5'
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
@@ -33,8 +33,11 @@ Run the entirely synthetic, offline product-shape preview:
 ```
 
 The parser isolation tests require macOS `sandbox-exec` and must run outside an
-already nested application sandbox. A Linux CI run must replace this policy
-with an isolated runner or container that also enforces a hard memory limit.
+already nested application sandbox. On Linux the parser has no built-in
+sandbox, so the network-denial test runs only inside a no-network container
+(`scripts/run_linux_gate0.py` uses `docker run --network none` with a hard
+memory limit) and is reported as skipped, with the reason, on an ordinary Linux
+host such as CI.
 
 The contracts are frozen as `contract_version: 1.0`. A breaking change requires
 a new contract version; it must not overwrite v1 or prior run evidence.

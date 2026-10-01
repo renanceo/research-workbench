@@ -34,6 +34,13 @@
       "source_commit": "bec4c3158aac886941fd1ed0eb6cd49281cbe4bc",
       "aat_golden_case_authorized": true,
       "immutable": true
+    },
+    {
+      "run_id": "gate0-aat-golden-20260806T031033Z",
+      "file": "GATE0_AAT_GOLDEN_RUN_20260806T031033Z.json",
+      "provenance": "commit_bound_aat_golden_integration_run",
+      "source_commit": "4d2d34b8a4941814a28e5b1f837d0b33d8561a42",
+      "immutable": true
     }
   ]
 }
