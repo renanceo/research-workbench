@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from gate0.aat import AATGoldenHarness, AAT_INTEGRATION_VERSION, ENGINE_VERSION, PROTOCOL_VERSION, fidelity_checks
+from gate0.parser.worker import PARSER_VERSION
 from gate0.report_pipeline import PDF_EXPORTER_VERSION, REPORT_PIPELINE_VERSION, SANITIZER_VERSION
 
 
@@ -71,6 +72,7 @@ def main() -> int:
                 "aat_integration": AAT_INTEGRATION_VERSION,
                 "engine": ENGINE_VERSION,
                 "protocol": PROTOCOL_VERSION,
+                "parser": PARSER_VERSION,
                 "report_pipeline": REPORT_PIPELINE_VERSION,
                 "sanitizer": SANITIZER_VERSION,
                 "pdf_exporter": PDF_EXPORTER_VERSION,
