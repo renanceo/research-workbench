@@ -6,5 +6,8 @@ updates:
       interval: monthly
   - package-ecosystem: pip
     directory: /
+    # Only widen a range when a release falls outside it. Raising the lower
+    # bound (e.g. jsonschema>=4.26) would drop Python 3.9 for no gain.
+    versioning-strategy: increase-if-necessary
     schedule:
       interval: monthly
