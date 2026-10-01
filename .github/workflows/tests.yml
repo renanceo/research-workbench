@@ -53,5 +53,6 @@ jobs:
           --cpus 1.0
           --tmpfs /tmp:rw,noexec,nosuid,size=128m
           --ulimit nofile=64:64
+          --env RW_REQUIRE_NETWORK_ISOLATION=1
           research-workbench-gate0:ci
           python -m unittest discover -s tests -v
