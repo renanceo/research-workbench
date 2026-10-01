@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "research-workbench-gate0"
 version = "0.1.0"
 requires-python = ">=3.9"
-dependencies = ["jsonschema>=4.23,<5", "pypdf>=5,<7", "reportlab>=4,<5"]
+dependencies = ["jsonschema>=4.26.0,<5", "pypdf>=5,<7", "reportlab>=4,<5"]
 
 [project.optional-dependencies]
 test = []
