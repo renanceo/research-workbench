@@ -43,6 +43,21 @@ body:
       description: Give a brief availability window; exact workload is disclosed before qualification.
     validations:
       required: true
+  - type: dropdown
+    id: discovery_source
+    attributes:
+      label: How did you hear about this project?
+      description: Optional; this helps us understand which research communities the notice reaches.
+      options:
+        - GitHub
+        - X / Twitter
+        - LinkedIn
+        - ResearchGate
+        - Academic community
+        - Direct invitation
+        - Other
+    validations:
+      required: false
   - type: checkboxes
     id: independence
     attributes:
