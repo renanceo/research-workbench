@@ -26,3 +26,32 @@ jobs:
         run: python -m pip show jsonschema pypdf reportlab | grep -E '^(Name|Version):'
       - name: Run test suite
         run: python -m unittest discover -s tests -v
+
+  # The unittest job above skips the parser network-denial test, because an
+  # ordinary Linux runner has a network and the parser has no built-in Linux
+  # sandbox. This job runs the suite in the pinned linux/Dockerfile image under
+  # the same restrictions as restricted_run_args() in scripts/run_linux_gate0.py,
+  # so that test actually runs on every PR.
+  isolated-container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build pinned isolation image
+        run: >-
+          docker build -f linux/Dockerfile
+          --build-arg SOURCE_COMMIT=${{ github.sha }}
+          -t research-workbench-gate0:ci .
+      - name: Run test suite with no network and hard resource limits
+        run: >-
+          docker run --rm
+          --network none
+          --read-only
+          --cap-drop ALL
+          --security-opt no-new-privileges:true
+          --pids-limit 64
+          --memory 768m --memory-swap 768m
+          --cpus 1.0
+          --tmpfs /tmp:rw,noexec,nosuid,size=128m
+          --ulimit nofile=64:64
+          research-workbench-gate0:ci
+          python -m unittest discover -s tests -v
