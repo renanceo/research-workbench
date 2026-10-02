@@ -121,6 +121,14 @@ def json_output(result: subprocess.CompletedProcess[str]) -> dict[str, Any]:
         return {}
 
 
+def parser_version() -> str:
+    source = (ROOT / "gate0" / "parser" / "worker.py").read_text(encoding="utf-8")
+    match = re.search(r'^PARSER_VERSION = "([^"]+)"$', source, re.MULTILINE)
+    if match is None:
+        raise RuntimeError("PARSER_VERSION not found in gate0/parser/worker.py")
+    return match.group(1)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--build", action="store_true")
@@ -288,6 +296,7 @@ def main() -> int:
             restricted_run_args(image) + ["python", "-c", "import platform; print(platform.release())"]
         ),
         "contract_versions": {"public_contract": "1.0", "parser_output": "parser-output-1.0"},
+        "parser_version": parser_version(),
         "runtime": runtime,
         "commands": {
             "unit_tests": unit_args,

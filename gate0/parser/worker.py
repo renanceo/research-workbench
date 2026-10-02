@@ -10,16 +10,226 @@ import sys
 from pathlib import Path
 
 from pypdf import PdfReader
+from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NumberObject
 
 
-ACTIVE_MARKERS = (b"/JavaScript", b"/JS ", b"/Launch", b"/OpenAction", b"/AA ")
+PARSER_VERSION = "isolated-parser-2.1"
+
+# Byte markers are a fast first pass over uncompressed bytes only. Names that
+# legitimate papers carry (hyperref's /OpenAction /GoTo and /URI link
+# annotations) are not byte markers; they are judged structurally below, which
+# also covers objects compressed inside object streams (/ObjStm).
+ACTIVE_MARKERS = (b"/JavaScript", b"/JS ", b"/Launch")
 ATTACHMENT_MARKERS = (b"/EmbeddedFile", b"/Filespec", b"/EmbeddedFiles")
-EXTERNAL_MARKERS = (b"/URI", b"/GoToR", b"/SubmitForm", b"/ImportData")
+EXTERNAL_MARKERS = (b"/GoToR", b"/SubmitForm", b"/ImportData")
 EXTERNAL_FILE_REFERENCE = re.compile(
     rb"/(?:F|UF|DOS|Mac|Unix)\s*\((?:https?://|file:|\\\\)", re.IGNORECASE
 )
 WHITE_TEXT = re.compile(rb"(?:^|\s)(?:1(?:\.0+)?\s+){3}(?:rg|RG)\b[\s\S]{0,256}\bBT\b")
 TEXT_SHOW = re.compile(rb"\(((?:\\.|[^\\)])*)\)\s*(?:Tj|['\"])")
+ALLOWED_ACTIONS = {"/GoTo", "/URI"}
+EXTERNAL_ACTIONS = {"/GoToR", "/GoToE", "/SubmitForm", "/ImportData"}
+MAX_STRUCTURE_DEPTH = 64
+
+
+def _action_violation(action: object) -> str | None:
+    """Allow-list action types: in-document jumps and inert URI links only.
+
+    A /URI link is kept as data and never followed: the parser has no fetch
+    path and runs without network.
+    """
+    if not isinstance(action, DictionaryObject):
+        return "UNSAFE_ACTIVE_CONTENT"
+    kind = _action_kind(action)
+    if kind in ALLOWED_ACTIONS:
+        return None
+    if kind in EXTERNAL_ACTIONS:
+        return "EXTERNAL_RESOURCE"
+    return "UNSAFE_ACTIVE_CONTENT"
+
+
+# Dictionaries whose keys are arbitrary names chosen by the producer (glyph
+# names in Type3 /CharProcs, resource names, named destinations), so a key
+# such as /A, /AA or /JS inside them is a name, not an action. Only the map
+# itself is exempt; its values are still checked.
+NAME_KEYED = {
+    "/CharProcs", "/Font", "/XObject", "/ExtGState", "/ColorSpace", "/Pattern",
+    "/Shading", "/Properties", "/Dests", "/RoleMap", "/ClassMap",
+}
+# Annotations that carry a file or play media; their content is never needed for text.
+BLOCKED_ANNOTATIONS = {"/FileAttachment", "/Sound", "/Movie", "/Screen", "/RichMedia", "/3D"}
+
+
+def _is_structure_attributes(value: object) -> bool:
+    """Tagged-PDF structure elements use /A for attribute objects, not actions.
+
+    An attribute object names its owner with /O; an action always has /S.
+    Attribute arrays may interleave revision numbers.
+    """
+    value = value.get_object()
+    items = value if isinstance(value, ArrayObject) else [value]
+    for item in items:
+        item = item.get_object()
+        if isinstance(item, NumberObject) and isinstance(value, ArrayObject):
+            continue
+        if not isinstance(item, DictionaryObject) or "/O" not in item or "/S" in item:
+            return False
+    return True
+
+
+def _dictionary_violation(node: DictionaryObject) -> str | None:
+    """Default-deny reading of one dictionary's own keys, whatever its /Type.
+
+    Field and annotation types can be inherited or omitted, and /S can be an
+    indirect reference, so nothing here depends on the dictionary declaring
+    what it is.
+    """
+    if "/JS" in node or "/AA" in node:
+        return "UNSAFE_ACTIVE_CONTENT"
+    kind = _resolved(node, "/Type")
+    if kind in {"/EmbeddedFile", "/Filespec"} or "/EF" in node:
+        return "EMBEDDED_ATTACHMENT"
+    if _resolved(node, "/Subtype") in BLOCKED_ANNOTATIONS:
+        return "EMBEDDED_ATTACHMENT"
+    if "/FS" in node:
+        return "EXTERNAL_RESOURCE"
+    if kind == "/Action":
+        code = _action_violation(node)
+        if code:
+            return code
+    for key in ("/A", "/PA"):
+        if key in node and not _is_structure_attributes(node[key]):
+            code = _action_chain_violation(node[key])
+            if code:
+                return code
+    return None
+
+
+def _structure_violation(node: object, name_keyed: bool = False, depth: int = 0) -> str | None:
+    """Reject code for an object and its direct (non-referenced) children.
+
+    Every indirect object, including those inside object streams, is visited
+    on its own by structure_check, which also decides whether it is a name map.
+    """
+    if depth > MAX_STRUCTURE_DEPTH:
+        return "DOCUMENT_PARSE_FAILED"
+    if isinstance(node, DictionaryObject):
+        if not name_keyed:
+            code = _dictionary_violation(node)
+            if code:
+                return code
+        children = [(key, value) for key, value in node.items()]
+    elif isinstance(node, ArrayObject):
+        children = [(None, value) for value in node]
+    else:
+        return None
+    for key, child in children:
+        if isinstance(child, IndirectObject):
+            continue
+        code = _structure_violation(child, not name_keyed and key in NAME_KEYED, depth + 1)
+        if code:
+            return code
+    return None
+
+
+def _references(node: object, uses: dict[int, set[bool]], name_keyed: bool = False, depth: int = 0) -> None:
+    """Record, per referenced object, whether each reference is from a name-map slot."""
+    if depth > MAX_STRUCTURE_DEPTH:
+        return
+    if isinstance(node, DictionaryObject):
+        items = [(key, value) for key, value in node.items()]
+    elif isinstance(node, ArrayObject):
+        items = [(None, value) for value in node]
+    else:
+        return
+    for key, child in items:
+        child_name_keyed = not name_keyed and key in NAME_KEYED
+        if isinstance(child, IndirectObject):
+            uses.setdefault(child.idnum, set()).add(child_name_keyed)
+        else:
+            _references(child, uses, child_name_keyed, depth + 1)
+
+
+def _resolved(node: DictionaryObject, key: str) -> object:
+    value = node.get(key)
+    return None if value is None else value.get_object()
+
+
+def _action_kind(action: object) -> object:
+    return _resolved(action, "/S") if isinstance(action, DictionaryObject) else None
+
+
+def _action_chain_violation(action: object) -> str | None:
+    """Check an action and everything it chains to through /Next."""
+    pending = [action]
+    seen = 0
+    while pending:
+        seen += 1
+        if seen > MAX_STRUCTURE_DEPTH:
+            return "UNSAFE_ACTIVE_CONTENT"
+        current = pending.pop().get_object()
+        if isinstance(current, ArrayObject):
+            pending.extend(current)
+            continue
+        code = _action_violation(current)
+        if code:
+            return code
+        if "/Next" in current:
+            pending.append(current["/Next"])
+    return None
+
+
+def _open_action_violation(reader: PdfReader) -> str | None:
+    """Only a page jump may run when the document opens."""
+    action = reader.trailer["/Root"].get("/OpenAction")
+    if action is None or isinstance(action.get_object(), ArrayObject):
+        return None
+    pending = [action]
+    seen = 0
+    while pending:
+        seen += 1
+        if seen > MAX_STRUCTURE_DEPTH:
+            return "UNSAFE_ACTIVE_CONTENT"
+        current = pending.pop().get_object()
+        if isinstance(current, ArrayObject):
+            pending.extend(current)
+        elif _action_kind(current) != "/GoTo":
+            return "EXTERNAL_RESOURCE" if _action_kind(current) == "/URI" else "UNSAFE_ACTIVE_CONTENT"
+        elif "/Next" in current:
+            pending.append(current["/Next"])
+    return None
+
+
+def structure_check(reader: PdfReader) -> str | None:
+    """Inspect every object, so compressed object streams are covered too."""
+    code = _open_action_violation(reader)
+    if code:
+        return code
+    names = reader.trailer["/Root"].get("/Names")
+    if names is not None:
+        names = names.get_object()
+        if "/JavaScript" in names:
+            return "UNSAFE_ACTIVE_CONTENT"
+        if "/EmbeddedFiles" in names:
+            return "EMBEDDED_ATTACHMENT"
+    object_numbers: set[tuple[int, int]] = set()
+    for generation, entries in reader.xref.items():
+        object_numbers.update((number, generation) for number in entries)
+    object_numbers.update((number, 0) for number in reader.xref_objStm)
+    objects = [
+        reader.get_object(IndirectObject(number, generation, reader))
+        for number, generation in sorted(object_numbers)
+    ]
+    uses: dict[int, set[bool]] = {}
+    _references(reader.trailer, uses)
+    for obj in objects:
+        _references(obj, uses)
+    for (number, _), obj in zip(sorted(object_numbers), objects):
+        # A map is exempt only if every reference to it is from a name-map slot.
+        code = _structure_violation(obj, uses.get(number) == {True})
+        if code:
+            return code
+    return None
 
 
 def result(document_hash: str, status: str, **values: object) -> dict[str, object]:
@@ -56,6 +266,9 @@ def parse_pdf(path: Path, args: argparse.Namespace) -> dict[str, object]:
         reader = PdfReader(path, strict=True)
         if reader.is_encrypted:
             return reject(digest, "UNSUPPORTED_DOCUMENT")
+        structure_code = structure_check(reader)
+        if structure_code:
+            return reject(digest, structure_code)
         if len(reader.pages) > args.max_pages:
             return reject(digest, "PAGE_LIMIT_EXCEEDED")
 
