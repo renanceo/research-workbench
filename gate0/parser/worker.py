@@ -10,10 +10,10 @@ import sys
 from pathlib import Path
 
 from pypdf import PdfReader
-from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject
+from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NumberObject
 
 
-PARSER_VERSION = "isolated-parser-2.0"
+PARSER_VERSION = "isolated-parser-2.1"
 
 # Byte markers are a fast first pass over uncompressed bytes only. Names that
 # legitimate papers carry (hyperref's /OpenAction /GoTo and /URI link
@@ -40,7 +40,7 @@ def _action_violation(action: object) -> str | None:
     """
     if not isinstance(action, DictionaryObject):
         return "UNSAFE_ACTIVE_CONTENT"
-    kind = action.get("/S")
+    kind = _action_kind(action)
     if kind in ALLOWED_ACTIONS:
         return None
     if kind in EXTERNAL_ACTIONS:
@@ -48,49 +48,115 @@ def _action_violation(action: object) -> str | None:
     return "UNSAFE_ACTIVE_CONTENT"
 
 
-def _is_annotation(node: DictionaryObject) -> bool:
-    return node.get("/Type") == "/Annot" or ("/Subtype" in node and "/Rect" in node)
+# Dictionaries whose keys are arbitrary names chosen by the producer (glyph
+# names in Type3 /CharProcs, resource names, named destinations), so a key
+# such as /A, /AA or /JS inside them is a name, not an action. Only the map
+# itself is exempt; its values are still checked.
+NAME_KEYED = {
+    "/CharProcs", "/Font", "/XObject", "/ExtGState", "/ColorSpace", "/Pattern",
+    "/Shading", "/Properties", "/Dests", "/RoleMap", "/ClassMap",
+}
+# Annotations that carry a file or play media; their content is never needed for text.
+BLOCKED_ANNOTATIONS = {"/FileAttachment", "/Sound", "/Movie", "/Screen", "/RichMedia", "/3D"}
 
 
-def _structure_violation(node: object, depth: int = 0) -> str | None:
-    """Reject code for an unsafe object and its direct children.
+def _is_structure_attributes(value: object) -> bool:
+    """Tagged-PDF structure elements use /A for attribute objects, not actions.
 
-    Keys are only read where the PDF spec gives them a meaning (annotations,
-    outline items, pages, form fields, actions, file specifications), because
-    name-keyed dictionaries such as Type3 /CharProcs may use any key, e.g. a
-    glyph named /A or /S. Action values are resolved through indirect
-    references; every other indirect object, including those inside object
-    streams, is visited on its own by structure_check.
+    An attribute object names its owner with /O; an action always has /S.
+    Attribute arrays may interleave revision numbers.
+    """
+    value = value.get_object()
+    items = value if isinstance(value, ArrayObject) else [value]
+    for item in items:
+        item = item.get_object()
+        if isinstance(item, NumberObject) and isinstance(value, ArrayObject):
+            continue
+        if not isinstance(item, DictionaryObject) or "/O" not in item or "/S" in item:
+            return False
+    return True
+
+
+def _dictionary_violation(node: DictionaryObject) -> str | None:
+    """Default-deny reading of one dictionary's own keys, whatever its /Type.
+
+    Field and annotation types can be inherited or omitted, and /S can be an
+    indirect reference, so nothing here depends on the dictionary declaring
+    what it is.
+    """
+    if "/JS" in node or "/AA" in node:
+        return "UNSAFE_ACTIVE_CONTENT"
+    kind = _resolved(node, "/Type")
+    if kind in {"/EmbeddedFile", "/Filespec"} or "/EF" in node:
+        return "EMBEDDED_ATTACHMENT"
+    if _resolved(node, "/Subtype") in BLOCKED_ANNOTATIONS:
+        return "EMBEDDED_ATTACHMENT"
+    if "/FS" in node:
+        return "EXTERNAL_RESOURCE"
+    if kind == "/Action":
+        code = _action_violation(node)
+        if code:
+            return code
+    for key in ("/A", "/PA"):
+        if key in node and not _is_structure_attributes(node[key]):
+            code = _action_chain_violation(node[key])
+            if code:
+                return code
+    return None
+
+
+def _structure_violation(node: object, name_keyed: bool = False, depth: int = 0) -> str | None:
+    """Reject code for an object and its direct (non-referenced) children.
+
+    Every indirect object, including those inside object streams, is visited
+    on its own by structure_check, which also decides whether it is a name map.
     """
     if depth > MAX_STRUCTURE_DEPTH:
         return "DOCUMENT_PARSE_FAILED"
     if isinstance(node, DictionaryObject):
-        kind = node.get("/Type")
-        if kind in {"/EmbeddedFile", "/Filespec"} or ("/EF" in node and ("/F" in node or "/UF" in node)):
-            return "EMBEDDED_ATTACHMENT"
-        holds_actions = _is_annotation(node) or "/Title" in node or "/FT" in node or kind in {"/Page", "/Catalog"}
-        if holds_actions and "/AA" in node:
-            return "UNSAFE_ACTIVE_CONTENT"
-        if kind == "/Action" or (isinstance(node.get("/S"), NameObject) and "/JS" in node):
-            code = _action_violation(node)
+        if not name_keyed:
+            code = _dictionary_violation(node)
             if code:
                 return code
-        if holds_actions and "/A" in node:
-            code = _action_chain_violation(node["/A"])
-            if code:
-                return code
-        children = node.values()
+        children = [(key, value) for key, value in node.items()]
     elif isinstance(node, ArrayObject):
-        children = node
+        children = [(None, value) for value in node]
     else:
         return None
-    for child in children:
+    for key, child in children:
         if isinstance(child, IndirectObject):
             continue
-        code = _structure_violation(child, depth + 1)
+        code = _structure_violation(child, not name_keyed and key in NAME_KEYED, depth + 1)
         if code:
             return code
     return None
+
+
+def _references(node: object, uses: dict[int, set[bool]], name_keyed: bool = False, depth: int = 0) -> None:
+    """Record, per referenced object, whether each reference is from a name-map slot."""
+    if depth > MAX_STRUCTURE_DEPTH:
+        return
+    if isinstance(node, DictionaryObject):
+        items = [(key, value) for key, value in node.items()]
+    elif isinstance(node, ArrayObject):
+        items = [(None, value) for value in node]
+    else:
+        return
+    for key, child in items:
+        child_name_keyed = not name_keyed and key in NAME_KEYED
+        if isinstance(child, IndirectObject):
+            uses.setdefault(child.idnum, set()).add(child_name_keyed)
+        else:
+            _references(child, uses, child_name_keyed, depth + 1)
+
+
+def _resolved(node: DictionaryObject, key: str) -> object:
+    value = node.get(key)
+    return None if value is None else value.get_object()
+
+
+def _action_kind(action: object) -> object:
+    return _resolved(action, "/S") if isinstance(action, DictionaryObject) else None
 
 
 def _action_chain_violation(action: object) -> str | None:
@@ -127,8 +193,8 @@ def _open_action_violation(reader: PdfReader) -> str | None:
         current = pending.pop().get_object()
         if isinstance(current, ArrayObject):
             pending.extend(current)
-        elif current.get("/S") != "/GoTo":
-            return "EXTERNAL_RESOURCE" if current.get("/S") == "/URI" else "UNSAFE_ACTIVE_CONTENT"
+        elif _action_kind(current) != "/GoTo":
+            return "EXTERNAL_RESOURCE" if _action_kind(current) == "/URI" else "UNSAFE_ACTIVE_CONTENT"
         elif "/Next" in current:
             pending.append(current["/Next"])
     return None
@@ -150,9 +216,17 @@ def structure_check(reader: PdfReader) -> str | None:
     for generation, entries in reader.xref.items():
         object_numbers.update((number, generation) for number in entries)
     object_numbers.update((number, 0) for number in reader.xref_objStm)
-    for number, generation in sorted(object_numbers):
-        obj = reader.get_object(IndirectObject(number, generation, reader))
-        code = _structure_violation(obj)
+    objects = [
+        reader.get_object(IndirectObject(number, generation, reader))
+        for number, generation in sorted(object_numbers)
+    ]
+    uses: dict[int, set[bool]] = {}
+    _references(reader.trailer, uses)
+    for obj in objects:
+        _references(obj, uses)
+    for (number, _), obj in zip(sorted(object_numbers), objects):
+        # A map is exempt only if every reference to it is from a name-map slot.
+        code = _structure_violation(obj, uses.get(number) == {True})
         if code:
             return code
     return None

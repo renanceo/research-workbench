@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import socket
 import sys
@@ -25,6 +26,18 @@ from gate0.parser.runner import IsolatedParser, ParserLimits
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = Path(sys.executable)
 GATE0_001 = ROOT / "fixtures" / "security" / "GATE0-001-missing-font-text-budget.pdf"
+# Harmless synthetic counterexamples to isolated-parser-2.0 at 1036d57, supplied
+# with a reproduction package (zip sha256 22b5197f...); the inert JS is "0;".
+PR14_REPRO = {
+    "PR14-REPRO-attachment-filespec-without-type.pdf": (
+        "7987036b08706c44a438da59f28afe3d1fa2db83207230e9775e4730e4855975",
+        "EMBEDDED_ATTACHMENT",
+    ),
+    "PR14-REPRO-inherited-field-aa-objstm.pdf": (
+        "b2911748466a22a8943838f55c23ef72070af79f441137dd66b9ba29e101e117",
+        "UNSAFE_ACTIVE_CONTENT",
+    ),
+}
 
 
 def _linux_network_isolated() -> bool:
@@ -352,6 +365,81 @@ class ParserIsolationTests(unittest.TestCase):
         with source.open("wb") as handle:
             writer.write(handle)
         self.assertEqual("accepted", self.parser.parse(source)["status"])
+
+    def test_supplied_structural_counterexamples_are_rejected(self) -> None:
+        # 1: FileAttachment whose file spec has only /F (no /Type, no /EF).
+        # 2: child field inheriting /FT with its own /AA; the action omits /Type,
+        #    its /S is an indirect reference, and all of it sits in an /ObjStm.
+        for name, (digest, expected) in PR14_REPRO.items():
+            with self.subTest(name=name):
+                source = ROOT / "fixtures" / "security" / name
+                self.assertEqual(digest, hashlib.sha256(source.read_bytes()).hexdigest())
+                result = self.parser.parse(source)
+                self.assertEqual("rejected", result["status"])
+                self.assertEqual(expected, result["error_code"])
+
+    def test_structure_attributes_pass_but_action_shaped_ones_do_not(self) -> None:
+        def tagged(attributes: DictionaryObject) -> Path:
+            writer = PdfWriter()
+            page = writer.add_blank_page(width=612, height=792)
+            element = DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/StructElem"),
+                    NameObject("/S"): NameObject("/P"),
+                    NameObject("/Pg"): page.indirect_reference,
+                    NameObject("/A"): attributes,
+                }
+            )
+            writer._root_object[NameObject("/StructTreeRoot")] = DictionaryObject(
+                {NameObject("/K"): writer._add_object(element)}
+            )
+            source = self.directory / f"tagged-{len(attributes)}.pdf"
+            with source.open("wb") as handle:
+                writer.write(handle)
+            return source
+
+        layout = DictionaryObject(
+            {NameObject("/O"): NameObject("/Layout"), NameObject("/Placement"): NameObject("/Block")}
+        )
+        self.assertEqual("accepted", self.parser.parse(tagged(layout))["status"])
+        disguised = DictionaryObject(
+            {NameObject("/O"): NameObject("/Layout"), NameObject("/S"): NameObject("/Launch")}
+        )
+        self.assertEqual("UNSAFE_ACTIVE_CONTENT", self.parser.parse(tagged(disguised))["error_code"])
+
+    def test_name_map_exemption_needs_every_reference_to_be_a_name_map(self) -> None:
+        # The same dictionary used as Type3 /CharProcs and as a form field must
+        # still be read as a field, so its /AA is rejected.
+        writer = PdfWriter()
+        page = writer.add_blank_page(width=612, height=792)
+        glyph = DecodedStreamObject()
+        glyph.set_data(b"0 0 d0")
+        shared = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/T"): TextStringObject("f"),
+                    NameObject("/AA"): DictionaryObject(
+                        {NameObject("/K"): DictionaryObject({NameObject("/S"): NameObject("/GoTo")})}
+                    ),
+                }
+            )
+        )
+        page[NameObject("/Resources")] = DictionaryObject(
+            {NameObject("/Font"): DictionaryObject({NameObject("/T3"): DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Font"),
+                    NameObject("/Subtype"): NameObject("/Type3"),
+                    NameObject("/CharProcs"): shared,
+                }
+            )})}
+        )
+        writer._root_object[NameObject("/AcroForm")] = DictionaryObject(
+            {NameObject("/Fields"): ArrayObject([shared])}
+        )
+        source = self.directory / "shared-name-map.pdf"
+        with source.open("wb") as handle:
+            writer.write(handle)
+        self.assertEqual("UNSAFE_ACTIVE_CONTENT", self.parser.parse(source)["error_code"])
 
     def test_additional_actions_are_rejected(self) -> None:
         source = self.directory / "page-aa.pdf"
